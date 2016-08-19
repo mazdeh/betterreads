@@ -1,3 +1,4 @@
 /node_modules/
 src/auth.js
+/dist/*.js
 /dist/*.js.map

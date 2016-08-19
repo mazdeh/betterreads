@@ -13,13 +13,27 @@ app.use(express.static(__dirname + '/dist'));
 
 // maybe a different server to talk to googleapis?
 
-app.get('/books', function(req, res) {
+function getBooks() {
   var q = 'potter';
-  books.volumes.list({q, maxResult: 2}, function(err, response) {
-    if (err) console.log(err);
-    console.log('res: ', response)
+
+  var booksPromise = new Promise(function (resolve, reject) {
+    books.volumes.list({q, maxResult: 2}, function(err, response) {
+      if (err) reject(err);
+      resolve(response);
+    });
   })
-  res.send();
+  return booksPromise;
+}
+
+app.get('/books', function(req, res) {
+  getBooks().then(function(response) {
+    console.log('data form server: ', response);
+    res.send(response);
+    res.end();
+  })
+  .catch(function(reason) {
+    console.log('promise was problematic');
+  });
 })
 
 app.get('*', function(req, res) {
